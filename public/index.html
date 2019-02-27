@@ -1,0 +1,101 @@
+<html>
+    <head>
+        <script>
+            window.fbAsyncInit = function() {
+              FB.init({
+                appId      : '595064647565644',
+                cookie     : true,
+                xfbml      : true,
+                version    : 'v3.2'
+              });
+                
+              FB.AppEvents.logPageView();   
+                
+            };
+          
+            (function(d, s, id){
+               var js, fjs = d.getElementsByTagName(s)[0];
+               if (d.getElementById(id)) {return;}
+               js = d.createElement(s); js.id = id;
+               js.src = "https://connect.facebook.net/en_US/sdk.js";
+               fjs.parentNode.insertBefore(js, fjs);
+             }(document, 'script', 'facebook-jssdk'));
+        
+        
+            function statusChangeCallback(res){
+                var status = document.getElementById("status")
+                var fbLoginBtn = document.getElementById("fb-login")
+                var ta_res = document.getElementById("ta_res")
+                if(res.status === "connected"){
+                    fbLoginBtn.style.display = "none"
+                    document.getElementById("fb-logout").style.display = "block"
+                    status.innerHTML = "로그인 되었습니다"
+                }else if(res.status === "not_authorized"){
+                    status.innerHTML = "페북에는 로그인 되었지만 앱에는 로그인 되지 않았습니다"
+                    FB.login(function(res){
+                        if(res.status !== "connected") return
+                        fbLoginBtn.style.display = "none"
+                        status.innerHTML = "로그인 되었습니다"
+                        document.getElementById("fb-logout").style.display = "block"
+
+                        alert("로그인 되었습니다")
+                        ta_res.value = JSON.stringify(res)
+
+                    });
+                }else{
+                    status.innerHTML = "페이스북 로그인이 필요합니다"
+                    FB.login(function(res){
+                        if(res.status !== "connected") return
+                        fbLoginBtn.style.display = "none"
+                        status.innerHTML = "로그인 되었습니다"
+                        document.getElementById("fb-logout").style.display = "block"
+                        alert("로그인 되었습니다")
+                        
+                        ta_res.value = JSON.stringify(res)
+                    });
+                }
+                ta_res.value = JSON.stringify(res)
+            }
+        
+            function checkLoginState() {
+                console.log("checkLoginState called..")
+                FB.getLoginStatus(function(response) {
+                    statusChangeCallback(response);
+                });
+            }
+
+            function logout(){
+                FB.logout(function(){
+                    alert("로그아웃 되었습니다")
+                    location.reload();
+                })
+            }
+
+            window.onload = function(){
+                console.log("window.onload called..")
+                setTimeout(checkLoginState, 300)
+            }
+          
+          </script>
+    </head>
+    <body>
+        <div>
+            <h2>Facebook-OAuth Demo</h2>
+            <div id="status" ></div>
+            <div id="fb-login">
+                <fb:login-button scope="public_profile,email" onlogin="checkLoginState();"></fb:login-button>
+            </div>
+
+            <div id="fb-logout" style="display: none;">
+                <button onclick="logout();">로그아웃</button>
+            </div>
+            
+            <!--a href="/login">Please login</a-->
+        </div>   
+        <div style="margin-top:50px; color: #aaa;">
+            <div>서버응답</div>
+            <textarea id="ta_res" style="width: 500; height: 100; color:#aaa;"></textarea>
+        </div>
+
+    </body>
+</html>
