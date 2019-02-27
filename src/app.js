@@ -1,3 +1,7 @@
+/**
+ * Ref) http://blog.saltfactory.net/implements-nodejs-based-https-server/
+ * 
+ */
 var http=require('http'),  
     https = require('https'),
     express = require('express'),
@@ -8,29 +12,16 @@ var options = {
     cert: fs.readFileSync('cert.pem')
 };
 
-// var passport = require('passport')
-//   , FacebookStrategy = require('passport-facebook').Strategy;
-
-// passport.use(new FacebookStrategy({
-//     clientID: "595064647565644",
-//     clientSecret: "54ea5eae609f169faec50003b60422ed",
-//     callbackURL: "https://localhost/"
-//   },
-//   function(accessToken, refreshToken, profile, done) {
-//     console.log("user login")
-//     console.log(`accessToken = ${accessToken} , refreshToken = ${refreshToken}`)
-//     done(null, user)
-//   }
-// ));
-
-
-
+var bodyParser = require('body-parser')
+var loginRouter = require("./login.js")
 
 
 var port1 = 80;  
 var port2 = 443;
 
-var app = express();  
+var app = express();
+
+app.use(bodyParser.json());
 app.use(express.urlencoded());
 app.use(express.static('public'));
 
@@ -43,6 +34,9 @@ https.createServer(options, app).listen(port2, function(){
   console.log("Https server listening on port " + port2);
 });
 
+
+
+app.use('/login', loginRouter);
 
 // app.get('/login', function (req, res){  
 //     res.writeHead(200, {'Content-Type': 'text/html'});

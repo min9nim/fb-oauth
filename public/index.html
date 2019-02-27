@@ -22,37 +22,37 @@
              }(document, 'script', 'facebook-jssdk'));
         
         
+             function loginCallback(res){
+                
+                if(res.status !== "connected") return
+
+                fetch("/login", {
+                    method: "POST",
+                    credentials: "omit",
+                    headers: new Headers({ "Content-Type": "application/json" }),
+                    body: JSON.stringify({accessToken : res.authResponse.accessToken}, null, 2),
+                }).then(o => {
+                    return o.json();
+                }).then(json => {
+                    document.getElementById("fb-login").style.display = "none"
+                    document.getElementById("fb-logout").style.display = "block"
+                    document.getElementById("status").innerHTML = "로그인 되었습니다"
+                    ta_res.value = JSON.stringify(json)
+                })
+            }
+
             function statusChangeCallback(res){
                 var status = document.getElementById("status")
                 var fbLoginBtn = document.getElementById("fb-login")
                 var ta_res = document.getElementById("ta_res")
                 if(res.status === "connected"){
-                    fbLoginBtn.style.display = "none"
-                    document.getElementById("fb-logout").style.display = "block"
-                    status.innerHTML = "로그인 되었습니다"
+                    loginCallback(res)
                 }else if(res.status === "not_authorized"){
                     status.innerHTML = "페북에는 로그인 되었지만 앱에는 로그인 되지 않았습니다"
-                    FB.login(function(res){
-                        if(res.status !== "connected") return
-                        fbLoginBtn.style.display = "none"
-                        status.innerHTML = "로그인 되었습니다"
-                        document.getElementById("fb-logout").style.display = "block"
-
-                        alert("로그인 되었습니다")
-                        ta_res.value = JSON.stringify(res)
-
-                    });
+                    FB.login(loginCallback, {scope: 'public_profile,email'});
                 }else{
                     status.innerHTML = "페이스북 로그인이 필요합니다"
-                    FB.login(function(res){
-                        if(res.status !== "connected") return
-                        fbLoginBtn.style.display = "none"
-                        status.innerHTML = "로그인 되었습니다"
-                        document.getElementById("fb-logout").style.display = "block"
-                        alert("로그인 되었습니다")
-                        
-                        ta_res.value = JSON.stringify(res)
-                    });
+                    FB.login(loginCallback, {scope: 'public_profile,email'});
                 }
                 ta_res.value = JSON.stringify(res)
             }
