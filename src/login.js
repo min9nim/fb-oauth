@@ -25,7 +25,7 @@ router.post('/', function(req, res) {
         console.log(error);
       });
 
-    res.send({status:"ok"});
+    res.send({status:"ok", accessToken: req.body.accessToken});
 });
 
 
